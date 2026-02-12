@@ -9,7 +9,7 @@ const poblarProductos = async (request, response) => {
         let inserciones = 0;
         // Destructurar el objeto
         for(const product of products){
-            const { title, price, description, image} = product;
+            const { title, price, description, image, category} = product;
 
             const stock = Math.floor(Math.random() * 50) + 1;
 
@@ -18,7 +18,6 @@ const poblarProductos = async (request, response) => {
                 (nombre, precio, stock, descripcion, imagen_url)
                 VALUES ($1, $2, $3, $4, $5)
             `
-
             await pool.query(query, [title, price, stock, description, image]);
 
             inserciones++;
