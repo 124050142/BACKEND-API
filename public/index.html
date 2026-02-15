@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica 2.3 - El Buscador Inteligente</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; padding: 40px; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #1a73e8; text-align: center; }
+        
+        .search-container { display: flex; gap: 10px; margin-bottom: 30px; justify-content: center; }
+        input[type="text"] { width: 60%; padding: 12px; border: 2px solid #dfe1e5; border-radius: 24px; outline: none; transition: 0.3s; }
+        input[type="text"]:focus { border-color: #1a73e8; }
+        button { padding: 10px 20px; border: none; border-radius: 24px; background: #1a73e8; color: white; cursor: pointer; font-weight: bold; }
+        button:hover { background: #1557b0; }
+        
+        #status-msg { text-align: center; margin-bottom: 20px; font-weight: bold; color: #5f6368; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: #f8f9fa; color: #202124; text-transform: uppercase; font-size: 0.85rem; }
+        tr:hover { background-color: #f1f3f4; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Buscador de Productos</h1>
+
+    <div class="search-container">
+        <input type="text" id="inputSearch" placeholder="Busca por nombre o descripción...">
+        <button onclick="limpiar()">Limpiar búsqueda</button>
+    </div>
+
+    <div id="status-msg"></div>
+
+    <table id="productTable">
+        <thead>
+            <tr>
+                <th>NOMBRE</th>
+                <th>DESCRIPCION</th>
+                <th>CATEGORIA</th>
+                <th>PRECIO</th>
+                <th>STOCK</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            </tbody>
+    </table>
+</div>
+
+<script>
+    const inputSearch = document.getElementById('inputSearch');
+    const tableBody = document.getElementById('tableBody');
+    const statusMsg = document.getElementById('status-msg');
+
+    
+    async function fetchProducts(termino = '') {
+        
+        statusMsg.innerText = "Buscando...";
+        tableBody.innerHTML = "";
+
+        try {
+             
+            const url = termino 
+                ? `http://localhost:4000/api/productos/search?q=${termino}` 
+                : `http://localhost:4000/api/productos/search?q=`; 
+
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            
+            const productos = data.productos || data;
+
+            
+            if (productos.length === 0) {
+                statusMsg.innerText = `No encontramos productos que coincidan con '${termino}'`;
+                return;
+            }
+
+            statusMsg.innerText = ""; 
+            
+            productos.forEach(p => {
+                const row = `<tr>
+                    <td><strong>${p.nombre}</strong></td>
+                    <td>${p.descripcion}</td>
+                    <td>${p.categoria || 'General'}</td>
+                    <td>$${p.precio}</td>
+                    <td>${p.stock}</td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+
+        } catch (error) {
+            statusMsg.innerText = "Error de conexión con el servidor.";
+            console.error(error);
+        }
+    }
+
+    
+    inputSearch.addEventListener('input', (e) => {
+        const query = e.target.value;
+        if (query.length >= 1) {
+            fetchProducts(query);
+        } else {
+            fetchProducts();
+        }
+    });
+
+    
+    function limpiar() {
+        inputSearch.value = "";
+        fetchProducts("");
+    }
+
+    fetchProducts("");
+</script>
+
+</body>
+</html>

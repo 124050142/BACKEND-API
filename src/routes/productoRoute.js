@@ -1,7 +1,9 @@
-const express = require('express');
-const { poblarProductos } = require('../controllers/externalController');
-const router = express.Router();
 
-router.post('/poblar', poblarProductos);
+const express = require('express');
+const router = express.Router();
+const { buscarProductoPorNombre } = require('../controllers/productoController');
+
+
+router.get('/search', buscarProductoPorNombre); 
 
 module.exports = router;
