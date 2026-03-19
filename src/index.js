@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const productoRouter = require('./routes/productoRoute');
 const categoriaRouter = require('./routes/categoriaRoute');
+const authRouter = require('./routes/authRoute');
 require('dotenv').config();
 
 const app = express();
@@ -12,6 +13,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.use('/api/productos', productoRouter);
+app.use('/api/auth', authRouter);
 app.use('/api/categoria', categoriaRouter);
 
 const PORT = process.env.PORT || 4000;
